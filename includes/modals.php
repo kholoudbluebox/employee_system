@@ -50,9 +50,9 @@
   // ✅ تفعيل DataTables
   $(document).ready(function () {
     $('#employeeTable').DataTable({
-      pageLength: 5, // عدد الصفوف في كل صفحة
-      lengthChange: false, // إخفاء خيار "عرض عدد الصفوف"
-      order: [[0, 'asc']], // ترتيب حسب الاسم افتراضيًا
+      pageLength: 5, 
+      lengthChange: false, 
+      order: [[0, 'asc']], 
       language: {
         search: "_INPUT_",
         searchPlaceholder: "🔍 Search employee...",
@@ -65,7 +65,7 @@
 </script>
 
         <div class="modal-footer">
-          <button type="submit" name="add" class="btn btn-success">Add Employee</button>
+          <button type="submit" name="add" class="btn btn-primary">Add Employee</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         </div>
       </div>

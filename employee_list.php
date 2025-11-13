@@ -5,7 +5,7 @@ include 'includes/header.php';
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="fw-bold text-primary">Employee List</h2>
-    <button class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+    <button class="btn btn- shadow-sm" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
       ➕ Add Employee
     </button>
   </div>
@@ -80,7 +80,7 @@ include 'includes/header.php';
   <div class="modal-dialog">
     <form method="POST" action="actions/employees.php">
       <div class="modal-content">
-        <div class="modal-header bg-success text-white">
+        <div class="modal-header bg-primary text-white">
           <h5 class="modal-title">Add Employee</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
@@ -93,7 +93,7 @@ include 'includes/header.php';
           <div class="mb-3"><label>Hire Date</label><input type="date" name="hire_date" class="form-control" required></div>
         </div>
         <div class="modal-footer">
-          <button type="submit" name="add" class="btn btn-success">Save</button>
+          <button type="submit" name="add" class="btn btn-primary">Save</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         </div>
       </div>
