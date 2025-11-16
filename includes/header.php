@@ -26,10 +26,7 @@ include 'functions.php';
       <img src="kk.png" alt="Logo" class="logo"> FreeWork
     </a>
     <div class="collapse navbar-collapse">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="index.php">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="employee_list.php">Employee List</a></li>
-      </ul>
+  
     </div>
   </div>
 </nav>

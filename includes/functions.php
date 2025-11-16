@@ -17,7 +17,7 @@ function getAllEmployees($conn) {
 /**
  * Verify duplicate email
  */
-function isDuplicateEmail($conn, $email) {
+ {
     $stmt = $conn->prepare("SELECT id FROM employees WHERE email=?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -30,7 +30,7 @@ function isDuplicateEmail($conn, $email) {
 /**
  * Execute data insertion
  */
-function addEmployee($conn, $name, $email, $phone, $position, $salary, $hire_date) {
+ {
     $stmt = $conn->prepare("INSERT INTO employees (full_name, email, phone, position, salary, hire_date) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssds", $name, $email, $phone, $position, $salary, $hire_date);
     $result = $stmt->execute();

@@ -39,12 +39,12 @@ Reason: training project, no audit required.
 Used **Bootstrap modal** 
 
 ## Screenshots
-![dashboard](1.png)
-![Add Employee Modal](2.png)
-![Employee List](3.png)
-![Edit Employee](4.png)
-![Delete Employee](5.png)
-![Add Employee Modal from employee list](6.png)
+![dashboard](assets\images\1.png)
+![Add Employee Modal](assets\images\2.png)
+![Employee List](assets\images\3.png)
+![Edit Employee](assets\images\4.png)
+![Delete Employee](assets\images\5.png)
+![Add Employee Modal from employee list](assets\images\6.png)
 
 
 ## Video Demonstration

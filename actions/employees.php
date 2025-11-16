@@ -5,19 +5,32 @@ function clean_input($data) {
   return htmlspecialchars(trim($data));
 }
 
-/* ---------------- DELETE EMPLOYEE ---------------- */
-if(isset($_GET['delete'])) {
-  $id = intval($_GET['delete']);
-  $stmt = $conn->prepare("DELETE FROM employees WHERE id=?");
-  $stmt->bind_param("i", $id);
-  $stmt->execute();
-  $stmt->close();
+if (isset($_POST['edit'])) {
 
-  $_SESSION['message'] = "🗑️ Employee deleted successfully!";
-  $_SESSION['msg_type'] = "danger";
-  header("Location: ../employee_list.php");
-  exit;
+    $id = $_POST['id'];
+    $full_name = $_POST['full_name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $position = $_POST['position'];
+    $salary = $_POST['salary'];
+    $hire_date = $_POST['hire_date'];
+
+    // Prepared statement لتأمين البيانات
+    $stmt = $conn->prepare("UPDATE employees SET full_name=?, email=?, phone=?, position=?, salary=?, hire_date=? WHERE id=?");
+    $stmt->bind_param("ssssssi", $full_name, $email, $phone, $position, $salary, $hire_date, $id);
+
+    if ($stmt->execute()) {
+        $_SESSION['message'] = "Employee updated successfully!";
+        $_SESSION['msg_type'] = "success";
+    } else {
+        $_SESSION['message'] = "Failed to update employee!";
+        $_SESSION['msg_type'] = "danger";
+    }
+
+    header("Location: ../index.php");
+    exit;
 }
+
 
 /* ---------------- ADD EMPLOYEE ---------------- */
 if(isset($_POST['add'])){
@@ -31,7 +44,7 @@ if(isset($_POST['add'])){
   if(empty($name) || empty($email) || empty($phone) || empty($position) || empty($salary) || empty($hire)) {
     $_SESSION['message'] = "⚠️ All fields are required!";
     $_SESSION['msg_type'] = "warning";
-    header("Location: ../employee_list.php");
+    header("Location: ../index.php");
     exit;
   }
 
@@ -44,7 +57,7 @@ if(isset($_POST['add'])){
     $_SESSION['message'] = "🚫 Email or phone number already exists!";
     $_SESSION['msg_type'] = "danger";
     $check->close();
-    header("Location: ../employee_list.php");
+    header("Location: ../index.php");
     exit;
   }
   $check->close();
@@ -56,12 +69,25 @@ if(isset($_POST['add'])){
 
   $_SESSION['message'] = "✅ Employee added successfully!";
   $_SESSION['msg_type'] = "success";
-  header("Location: ../employee_list.php");
+  header("Location: ../index.php");
   exit;
 }
+if (isset($_POST['delete'])) {
+    $id = intval($_POST['id']);
+    $stmt = $conn->prepare("DELETE FROM employees WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
+
+    $_SESSION['message'] = "Employee deleted successfully.";
+    $_SESSION['msg_type'] = "danger";
+    header("Location: ../index.php");
+    exit;
+}
+
 
 /* ---------------- UPDATE EMPLOYEE ---------------- */
-if(isset($_POST['save'])){
+if(isset($_POST['edit'])){
   $id = intval($_POST['id']);
   $name = clean_input($_POST['full_name']);
   $email = clean_input($_POST['email']);
@@ -73,7 +99,7 @@ if(isset($_POST['save'])){
   if(empty($name) || empty($email) || empty($phone) || empty($position) || empty($salary) || empty($hire)) {
     $_SESSION['message'] = "⚠️ All fields are required!";
     $_SESSION['msg_type'] = "warning";
-    header("Location: ../employee_list.php");
+    header("Location: ../index.php");
     exit;
   }
 
@@ -86,7 +112,7 @@ if(isset($_POST['save'])){
     $_SESSION['message'] = "🚫 Email or phone number already exists!";
     $_SESSION['msg_type'] = "danger";
     $check->close();
-    header("Location: ../employee_list.php");
+    header("Location: ../index.php");
     exit;
   }
   $check->close();
@@ -98,7 +124,7 @@ if(isset($_POST['save'])){
 
   $_SESSION['message'] = "✏️ Employee updated successfully!";
   $_SESSION['msg_type'] = "info";
-  header("Location: ../employee_list.php");
+  header("Location: ../index.php");
   exit;
 }
 ?>
