@@ -48,7 +48,7 @@ Used **Bootstrap modal**
 
 
 ## Video Demonstration
-[video showing the mechanism of the employee system](7.mp4)
+[video showing the mechanism of the employee system](assets\7.mp4)
 
 
 

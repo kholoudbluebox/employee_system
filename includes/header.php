@@ -23,7 +23,7 @@ include 'functions.php';
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="index.php">
-      <img src="kk.png" alt="Logo" class="logo"> FreeWork
+      <img src="assets\images\kk.png" alt="Logo" class="logo"> FreeWork
     </a>
     <div class="collapse navbar-collapse">
   

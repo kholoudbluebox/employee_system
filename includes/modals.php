@@ -4,8 +4,10 @@
     <form method="POST" action="actions/employees.php">
       <div class="modal-content">
         <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title">Add Employee</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      
+<button id="addEmployeeBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+  ➕ Add Employee
+</button>
         </div>
         <div class="modal-body">
           <div class="mb-3"><label>Full Name</label><input type="text" name="full_name" class="form-control" required></div>
