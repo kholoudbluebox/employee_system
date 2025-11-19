@@ -40,6 +40,9 @@
 <?php include 'includes/modals.php'; ?>
 <?php include 'includes/footer.php'; ?>
 
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 let table = $('#employeeTable').DataTable({
     searching: false,
@@ -100,45 +103,80 @@ $(document).on('click', '.delete-btn', function(){
     $('#delete_id').val($(this).data('id'));
 });
 
-// Add Employee AJAX
+// ----------- ADD EMPLOYEE -----------
 $('#addEmployeeForm').on('submit', function(e){
     e.preventDefault();
     $.ajax({
         url: 'actions/employees.php',
         method: 'POST',
         data: $(this).serialize() + '&add=1',
+        dataType: 'json',
         success: function(res){
-            $('#addEmployeeModal').modal('hide');
-            $('#addEmployeeForm')[0].reset();
-            table.ajax.reload(null, false);
+            if(res.status === 'error'){
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: res.message
+                });
+            } else {
+                $('#addEmployeeModal').modal('hide');
+                $('#addEmployeeForm')[0].reset();
+                table.ajax.reload(null, false);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Added!',
+                    text: 'Employee added successfully'
+                });
+            }
         }
     });
 });
 
-// Edit Employee AJAX
+// ----------- EDIT EMPLOYEE -----------
 $('#editEmployeeForm').on('submit', function(e){
     e.preventDefault();
     $.ajax({
         url: 'actions/employees.php',
         method: 'POST',
         data: $(this).serialize() + '&edit=1',
+        dataType: 'json',
         success: function(res){
-            $('#editEmployeeModal').modal('hide');
-            table.ajax.reload(null, false);
+            if(res.status === 'error'){
+                Swal.fire({ icon:'error', title:'Error', text: res.message });
+            } else {
+                $('#editEmployeeModal').modal('hide');
+                table.ajax.reload(null,false);
+                Swal.fire({ icon:'success', title:'Updated!', text:'Employee updated successfully' });
+            }
         }
     });
 });
 
-// Delete Employee AJAX
+// ----------- DELETE EMPLOYEE -----------
 $('#deleteEmployeeForm').on('submit', function(e){
     e.preventDefault();
-    $.ajax({
-        url: 'actions/employees.php',
-        method: 'POST',
-        data: $(this).serialize() + '&delete=1',
-        success: function(res){
-            $('#deleteEmployeeModal').modal('hide');
-            table.ajax.reload(null, false);
+    Swal.fire({
+        title: 'Are you sure?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result)=>{
+        if(result.isConfirmed){
+            $.ajax({
+                url: 'actions/employees.php',
+                method: 'POST',
+                data: $('#deleteEmployeeForm').serialize() + '&delete=1',
+                dataType: 'json',
+                success: function(res){
+                    if(res.status==='success'){
+                        $('#deleteEmployeeModal').modal('hide');
+                        table.ajax.reload(null,false);
+                        Swal.fire('Deleted!','Employee has been deleted.','success');
+                    } else {
+                        Swal.fire('Error','Could not delete employee','error');
+                    }
+                }
+            });
         }
     });
 });
