@@ -155,27 +155,22 @@ $('#editEmployeeForm').on('submit', function(e){
 // ----------- DELETE EMPLOYEE -----------
 $('#deleteEmployeeForm').on('submit', function(e){
     e.preventDefault();
-    Swal.fire({
-        title: 'Are you sure?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result)=>{
-        if(result.isConfirmed){
-            $.ajax({
-                url: 'actions/employees.php',
-                method: 'POST',
-                data: $('#deleteEmployeeForm').serialize() + '&delete=1',
-                dataType: 'json',
-                success: function(res){
-                    if(res.status==='success'){
-                        $('#deleteEmployeeModal').modal('hide');
-                        table.ajax.reload(null,false);
-                        Swal.fire('Deleted!','Employee has been deleted.','success');
-                    } else {
-                        Swal.fire('Error','Could not delete employee','error');
-                    }
-                }
+
+    $.ajax({
+        url: 'actions/employees.php',
+        method: 'POST',
+        data: $('#deleteEmployeeForm').serialize() + '&delete=1',
+        dataType: 'json',
+        success: function(res){
+            $('#deleteEmployeeModal').modal('hide'); 
+            table.ajax.reload(null, false);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Deleted!',
+                text: 'Employee has been deleted.',
+                timer: 2000,
+                showConfirmButton: false
             });
         }
     });
