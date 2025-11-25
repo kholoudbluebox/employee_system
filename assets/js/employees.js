@@ -1,5 +1,11 @@
 $(document).ready(function(){
 
+    // Get current user role from PHP
+    let currentRole = window.currentRole || 'employee'; // 'admin', 'manager', 'employee'
+   // إخفاء زر الإضافة للموظف
+    if(currentRole === 'employee'){
+        $('button[data-bs-target="#addEmployeeModal"]').hide();
+    }
     // Initialize DataTable
     let table = $('#employeeTable').DataTable({
         searching: false,
@@ -7,7 +13,7 @@ $(document).ready(function(){
             url: "actions/get_employees.php",
             data: function(d){ d.search = $('#liveSearch').val(); },
             dataSrc: "",
-            error: function(xhr, status, error){ // Added AJAX error callback
+            error: function(xhr, status, error){
                 Swal.fire({ icon: 'error', title: 'AJAX Error', text: error });
             }
         },
@@ -16,20 +22,21 @@ $(document).ready(function(){
             { data: "email" },
             { data: "phone" },
             { data: "position" },
-            { data: "salary", render: data => "$" + parseFloat(data).toFixed(2) },
+            { data: "salary", render: function(data,type,row){
+                return currentRole === 'employee' ? '••••' : "$" + parseFloat(data).toFixed(2);
+            }},
             { data: "hire_date" },
-            { data: "id", render: function(id, type, row){
-                return `
-                    <button class="btn btn-sm btn-warning edit-btn"
-                            data-id="${id}" data-name="${row.full_name}"
-                            data-email="${row.email}" data-phone="${row.phone}"
-                            data-position="${row.position}" data-salary="${row.salary}"
-                            data-hire="${row.hire_date}" data-bs-toggle="modal"
-                            data-bs-target="#editEmployeeModal">✏ Edit</button>
-                    <button class="btn btn-sm btn-danger delete-btn"
-                            data-id="${id}" data-bs-toggle="modal"
-                            data-bs-target="#deleteEmployeeModal">🗑 Delete</button>
-                `;
+            { data: "id", render: function(id,type,row){
+                if(currentRole === 'employee') return '';
+                let editBtn = `<button class="btn btn-sm btn-warning edit-btn"
+                                data-id="${id}" data-name="${row.full_name}"
+                                data-email="${row.email}" data-phone="${row.phone}"
+                                data-position="${row.position}" data-salary="${row.salary}"
+                                data-hire="${row.hire_date}" data-role="${row.role}"
+                                data-bs-toggle="modal" data-bs-target="#editEmployeeModal">✏ Edit</button>`;
+                let deleteBtn = currentRole === 'admin' ? `<button class="btn btn-sm btn-danger delete-btn"
+                                data-id="${id}" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal">🗑 Delete</button>` : '';
+                return editBtn + ' ' + deleteBtn;
             }}
         ]
     });
@@ -42,29 +49,28 @@ $(document).ready(function(){
         let data = table.ajax.json() || [];
         let total = 0;
         data.forEach(emp => total += parseFloat(emp.salary));
-        $('#totalSalary').text("$" + total.toFixed(2));
+        $('#totalSalary').text(currentRole === 'employee' ? '••••' : "$" + total.toFixed(2));
     });
 
-    // Fill edit/delete modal data
-$(document).on('click', '.edit-btn', function(){
-    let btn = $(this);
-    $('#edit_id').val(btn.data('id'));
-    $('#edit_name').val(btn.data('name'));
-    $('#edit_email').val(btn.data('email'));
-    $('#edit_phone').val(btn.data('phone'));
-    $('#edit_position').val(btn.data('position'));
-    $('#edit_salary').val(btn.data('salary'));
-    $('#edit_hire').val(btn.data('hire'));
-    $('#edit_role').val(btn.data('role')); // هذا يملأ select بالـ role الحالي
-});
+    // Fill edit modal
+    $(document).on('click', '.edit-btn', function(){
+        let btn = $(this);
+        $('#edit_id').val(btn.data('id'));
+        $('#edit_name').val(btn.data('name'));
+        $('#edit_email').val(btn.data('email'));
+        $('#edit_phone').val(btn.data('phone'));
+        $('#edit_position').val(btn.data('position'));
+        $('#edit_salary').val(btn.data('salary'));
+        $('#edit_hire').val(btn.data('hire'));
+        $('#edit_role').val(btn.data('role'));
+    });
 
-    
     $(document).on('click', '.delete-btn', function(){
         $('#delete_id').val($(this).data('id'));
     });
 
     // Reset forms on modal hide
-    $('#addEmployeeModal').on('hidden.bs.modal', function(){
+    $('#addEmployeeModal, #editEmployeeModal').on('hidden.bs.modal', function(){
         $(this).find('form')[0].reset();
     });
 
@@ -74,78 +80,47 @@ $(document).on('click', '.edit-btn', function(){
         setTimeout(()=>{ btn.prop('disabled', false); }, 1000);
     }
 
-    // ---------- ADD EMPLOYEE -----------
-    $('#addEmployeeForm').on('submit', function(e){
-        e.preventDefault();
-        let btn = $(this).find('button[type="submit"]');
-        disableBtn(btn);
+    // AJAX submit function
+    function ajaxSubmit(formId, actionName, modalId){
+        $(formId).on('submit', function(e){
+            e.preventDefault();
+            let btn = $(this).find('button[type="submit"]');
+            disableBtn(btn);
 
-        // Client-side validation
-        if(!this.checkValidity()){
-            Swal.fire({ icon:'error', title:'Invalid Input', text:'Please fill all fields correctly.' });
-            return;
-        }
+            if(!this.checkValidity()){
+                Swal.fire({ icon:'error', title:'Invalid Input', text:'Please fill all fields correctly.' });
+                return;
+            }
 
-        let spinner = $('<span class="spinner-border spinner-border-sm ms-2"></span>');
-        btn.append(spinner);
+            let spinner = $('<span class="spinner-border spinner-border-sm ms-2"></span>');
+            btn.append(spinner);
 
-        $.ajax({
-            url: 'actions/employees.php',
-            method: 'POST',
-            data: $(this).serialize() + '&add=1',
-            dataType: 'json',
-            success: function(res){
-                if(res.status === 'error'){
-                    Swal.fire({ icon: 'error', title: 'Error', text: res.message });
-                } else {
-                    table.ajax.reload(null,false);
-                    Swal.fire({ icon:'success', title:'Added!', text: res.message, timer:1500, showConfirmButton:false });
-                    $('#addEmployeeModal').modal('hide');
-                }
-            },
-            error: function(xhr, status, error){
-                Swal.fire({ icon:'error', title:'AJAX Error', text: error });
-            },
-            complete: function(){ spinner.remove(); btn.prop('disabled', false); }
+            $.ajax({
+                url: 'actions/employees.php',
+                method: 'POST',
+                data: $(this).serialize() + '&' + actionName + '=1',
+                dataType: 'json',
+                success: function(res){
+                    if(res.status === 'error'){
+                        Swal.fire({ icon: 'error', title: 'Error', text: res.message });
+                    } else {
+                        table.ajax.reload(null,false);
+                        Swal.fire({ icon:'success', title: actionName==='add'?'Added':'Updated', text: res.message, timer:1500, showConfirmButton:false });
+                        $(modalId).modal('hide');
+                    }
+                },
+                error: function(xhr,status,error){
+                    Swal.fire({ icon:'error', title:'AJAX Error', text:error });
+                },
+                complete: function(){ spinner.remove(); btn.prop('disabled', false); }
+            });
         });
-    });
+    }
 
-    // ---------- EDIT EMPLOYEE -----------
-    $('#editEmployeeForm').on('submit', function(e){
-        e.preventDefault();
-        let btn = $(this).find('button[type="submit"]');
-        disableBtn(btn);
+    ajaxSubmit('#addEmployeeForm', 'add', '#addEmployeeModal');
+    ajaxSubmit('#editEmployeeForm', 'edit', '#editEmployeeModal');
 
-        if(!this.checkValidity()){
-            Swal.fire({ icon:'error', title:'Invalid Input', text:'Please fill all fields correctly.' });
-            return;
-        }
-
-        let spinner = $('<span class="spinner-border spinner-border-sm ms-2"></span>');
-        btn.append(spinner);
-
-        $.ajax({
-            url: 'actions/employees.php',
-            method: 'POST',
-            data: $(this).serialize() + '&edit=1',
-            dataType: 'json',
-            success: function(res){
-                if(res.status === 'error'){
-                    Swal.fire({ icon: 'error', title: 'Error', text: res.message });
-                } else {
-                    table.ajax.reload(null,false);
-                    Swal.fire({ icon:'success', title:'Updated!', text: res.message, timer:1500, showConfirmButton:false });
-                    $('#editEmployeeModal').modal('hide');
-                }
-            },
-            error: function(xhr,status,error){
-                Swal.fire({ icon:'error', title:'AJAX Error', text:error });
-            },
-            complete: function(){ spinner.remove(); btn.prop('disabled', false); }
-        });
-    });
-
-    // ---------- DELETE EMPLOYEE -----------
+    // Delete employee
     $('#deleteEmployeeForm').on('submit', function(e){
         e.preventDefault();
         let btn = $('#deleteEmployeeForm button[type="submit"]');
@@ -154,23 +129,23 @@ $(document).on('click', '.edit-btn', function(){
         btn.append(spinner);
 
         $.ajax({
-            url: 'actions/employees.php',
-            method: 'POST',
-            data: $(this).serialize() + '&delete=1',
-            dataType: 'json',
-            success: function(res){
+            url:'actions/employees.php',
+            method:'POST',
+            data: $(this).serialize()+'&delete=1',
+            dataType:'json',
+            success:function(res){
                 table.ajax.reload(null,false);
                 Swal.fire({ icon:'success', title:'Deleted!', text: res.message, timer:1500, showConfirmButton:false });
                 $('#deleteEmployeeModal').modal('hide');
             },
-            error: function(xhr,status,error){
+            error:function(xhr,status,error){
                 Swal.fire({ icon:'error', title:'AJAX Error', text:error });
             },
-            complete: function(){ spinner.remove(); btn.prop('disabled', false); }
+            complete:function(){ spinner.remove(); btn.prop('disabled', false); }
         });
     });
 
-    // Fix stuck backdrop issue
+    // Fix stuck backdrop
     $(document).on('hidden.bs.modal', function () {
         $('.modal-backdrop').remove(); 
         $('body').removeClass('modal-open'); 

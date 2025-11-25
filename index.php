@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 if(!isset($_SESSION['employee_id'])){
     header('Location: login.php');
     exit();
@@ -16,10 +17,10 @@ $canDelete = $role === 'admin';
 
 <?php include 'includes/header.php'; ?>
 
-<h2>Welcome <?= $_SESSION['full_name'] ?> (<?= ucfirst($role) ?>)</h2>
+<h2>Welcome </h2>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="fw-bold text-primary">Employee List</h2>
+    <h2 class="fw-bold text-primary"><?= $_SESSION['full_name'] ?> (<?= ucfirst($role) ?>)</h2>
     <?php if($canAdd): ?>
 
     <?php endif; ?>

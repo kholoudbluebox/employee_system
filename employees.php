@@ -1,3 +1,7 @@
+<?php session_start(); ?>
+<script>
+    var currentRole = "<?= $_SESSION['role'] ?>"; // admin / manager / employee
+</script>
 <?php include 'includes/header.php'; ?>
 
 <h2>Welcome to Employee System</h2>
