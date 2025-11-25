@@ -49,33 +49,45 @@ class Employee {
     /**
      * Edit an existing employee
      */
-    public function edit($data){
-        try {
-            $this->validate($data, true);
+   public function edit($data){
+    try {
+        $this->validate($data, true);
 
-            $stmt = $this->conn->prepare("SELECT id FROM employees WHERE email=? AND id<>?");
-            $stmt->bind_param("si", $data['email'], $data['id']);
-            $stmt->execute();
-            $stmt->store_result();
-            if($stmt->num_rows > 0) throw new Exception("Email already exists.");
-            $stmt->close();
+        // تحقق من تكرار الإيميل
+        $stmt = $this->conn->prepare("SELECT id FROM employees WHERE email=? AND id<>?");
+        $stmt->bind_param("si", $data['email'], $data['id']);
+        $stmt->execute();
+        $stmt->store_result();
+        if($stmt->num_rows > 0) throw new Exception("Email already exists.");
+        $stmt->close();
 
-            $stmt = $this->conn->prepare("SELECT id FROM employees WHERE phone=? AND id<>?");
-            $stmt->bind_param("si", $data['phone'], $data['id']);
-            $stmt->execute();
-            $stmt->store_result();
-            if($stmt->num_rows > 0) throw new Exception("Phone number already exists.");
-            $stmt->close();
+        // تحقق من تكرار الهاتف
+        $stmt = $this->conn->prepare("SELECT id FROM employees WHERE phone=? AND id<>?");
+        $stmt->bind_param("si", $data['phone'], $data['id']);
+        $stmt->execute();
+        $stmt->store_result();
+        if($stmt->num_rows > 0) throw new Exception("Phone number already exists.");
+        $stmt->close();
 
-            $stmt = $this->conn->prepare("UPDATE employees SET full_name=?, email=?, phone=?, position=?, salary=?, hire_date=? WHERE id=?");
-            $stmt->bind_param("ssssdsi", $data['full_name'], $data['email'], $data['phone'], $data['position'], $data['salary'], $data['hire_date'], $data['id']);
-            if(!$stmt->execute()) throw new Exception("Failed to update employee.");
-            return ['status'=>'success','message'=>'Employee updated successfully'];
+        // تحديث البيانات بما فيها role
+        $stmt = $this->conn->prepare("
+            UPDATE employees 
+            SET full_name=?, email=?, phone=?, position=?, salary=?, hire_date=?, role=? 
+            WHERE id=?
+        ");
+        $stmt->bind_param(
+            "ssssdssi", 
+            $data['full_name'], $data['email'], $data['phone'], 
+            $data['position'], $data['salary'], $data['hire_date'], 
+            $data['role'], $data['id']
+        );
+        if(!$stmt->execute()) throw new Exception("Failed to update employee.");
+        return ['status'=>'success','message'=>'Employee updated successfully'];
 
-        } catch(Exception $e){
-            return ['status'=>'error','message'=>$e->getMessage()];
-        }
+    } catch(Exception $e){
+        return ['status'=>'error','message'=>$e->getMessage()];
     }
+}
 
     /**
      * Delete an employee

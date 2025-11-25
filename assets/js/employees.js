@@ -46,16 +46,18 @@ $(document).ready(function(){
     });
 
     // Fill edit/delete modal data
-    $(document).on('click', '.edit-btn', function(){
-        let btn = $(this);
-        $('#edit_id').val(btn.data('id'));
-        $('#edit_name').val(btn.data('name'));
-        $('#edit_email').val(btn.data('email'));
-        $('#edit_phone').val(btn.data('phone'));
-        $('#edit_position').val(btn.data('position'));
-        $('#edit_salary').val(btn.data('salary'));
-        $('#edit_hire').val(btn.data('hire'));
-    });
+$(document).on('click', '.edit-btn', function(){
+    let btn = $(this);
+    $('#edit_id').val(btn.data('id'));
+    $('#edit_name').val(btn.data('name'));
+    $('#edit_email').val(btn.data('email'));
+    $('#edit_phone').val(btn.data('phone'));
+    $('#edit_position').val(btn.data('position'));
+    $('#edit_salary').val(btn.data('salary'));
+    $('#edit_hire').val(btn.data('hire'));
+    $('#edit_role').val(btn.data('role')); // هذا يملأ select بالـ role الحالي
+});
+
     
     $(document).on('click', '.delete-btn', function(){
         $('#delete_id').val($(this).data('id'));
